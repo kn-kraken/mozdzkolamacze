@@ -46,7 +46,7 @@ export default function RootLayout({
             </div>
             <Image src={navRight} alt="" className="h-full w-auto" />
           </nav>
-          <main className="flex-1 bg-white overflow-hidden">{children}</main>
+          <main className="flex-1 min-h-0 bg-white overflow-hidden">{children}</main>
         </div>
       </body>
     </html>
