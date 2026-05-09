@@ -10,7 +10,7 @@ from langchain_text_splitters import MarkdownHeaderTextSplitter
 
 load_dotenv()
 
-_SYSTEM_PROMPT = """You are filtering sections of a technical book for a learning tool.
+_FILTER_PROMPT = """You are filtering sections of a technical book for a learning tool.
 
 Decide which sections contain SUBSTANTIVE LEARNING CONTENT that a student needs to read.
 
@@ -19,6 +19,21 @@ SKIP: prefaces, acknowledgements, author bios, copyright notices, table of conte
 
 Return ONLY a JSON array of indices (0-based) to keep. No explanation, no markdown — just the array.
 Example: [0, 2, 3, 5]"""
+
+_EVAL_PROMPT = """You are evaluating a student's summary of a technical book section.
+
+You will receive the original section content and the student's summary.
+Decide if the summary correctly captures the key concepts.
+
+If the summary is correct and complete enough: respond with exactly: OK
+If the summary is missing something important or is wrong: respond with a short hint in the same language as the summary (1-2 sentences, start with what is missing or wrong). Do not give away the answer — just hint."""
+
+
+def _llm() -> ChatGoogleGenerativeAI:
+    return ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash",
+        google_api_key=os.getenv("GEMINI_KEY"),
+    )
 
 
 def extract_markdown(path: str) -> str:
@@ -32,6 +47,16 @@ def build_chunks(md: str) -> list[dict]:
     raw = splitter.split_text(md)
     chunks = _to_hierarchy(raw)
     return _filter_with_llm(chunks)
+
+
+def evaluate_summary(chunk_content: str, summary: str) -> str | None:
+    """Returns None if OK, or a hint string if the summary is insufficient."""
+    response = _llm().invoke([
+        SystemMessage(content=_EVAL_PROMPT),
+        HumanMessage(content=f"Section content:\n{chunk_content}\n\nStudent summary:\n{summary}"),
+    ])
+    result = response.content.strip()
+    return None if result == "OK" else result
 
 
 def _to_hierarchy(raw_chunks) -> list[dict]:
@@ -75,14 +100,9 @@ def _filter_with_llm(chunks: list[dict]) -> list[dict]:
     if not chunks:
         return chunks
 
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash",
-        google_api_key=os.getenv("GEMINI_KEY"),
-    )
-
     titles = "\n".join(f"{i}. {c['title']}" for i, c in enumerate(chunks))
-    response = llm.invoke([
-        SystemMessage(content=_SYSTEM_PROMPT),
+    response = _llm().invoke([
+        SystemMessage(content=_FILTER_PROMPT),
         HumanMessage(content=f"Section titles:\n{titles}"),
     ])
 
