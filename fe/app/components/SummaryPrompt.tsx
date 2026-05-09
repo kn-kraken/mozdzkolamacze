@@ -1,9 +1,17 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function SummaryPrompt({ visible }: { visible: boolean }) {
   const [answer, setAnswer] = useState("");
+  const router = useRouter();
+
+  const handleSubmit = () => {
+    if (Math.random() < 0.5) {
+      router.push(`/learn/${crypto.randomUUID()}`);
+    }
+  };
 
   return (
     <div
@@ -28,6 +36,7 @@ export default function SummaryPrompt({ visible }: { visible: boolean }) {
           <button
             suppressHydrationWarning
             disabled={!answer.trim()}
+            onClick={handleSubmit}
             className="mt-3 px-6 py-2 bg-gray-500 text-white font-semibold rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-600 active:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             Submit
