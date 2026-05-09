@@ -132,6 +132,7 @@ export default function LearnPage() {
           />
           <div className="flex justify-end">
             <button
+              suppressHydrationWarning
               disabled={!answer.trim()}
               className="mt-3 px-6 py-2 bg-gray-500 text-white font-semibold rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-600 active:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed">
               Submit
