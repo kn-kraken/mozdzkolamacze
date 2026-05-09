@@ -1,3 +1,7 @@
+"use client";
+
+import { ChevronRight } from "lucide-react";
+import { useCallback, useRef, useState } from "react";
 import Markdown from "react-markdown";
 
 const content = `
@@ -21,11 +25,35 @@ There are many variations of passages of Lorem Ipsum available, but the majority
 `;
 
 export default function LearnPage() {
+  const [reachedBottom, setReachedBottom] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el || reachedBottom) return;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 10) {
+      setReachedBottom(true);
+    }
+  }, [reachedBottom]);
+
   return (
-    <div className="overflow-auto h-full">
-      <article className="prose max-w-3xl mx-auto p-8">
+    <div
+      className="flex h-full overflow-auto"
+      ref={scrollRef}
+      onScroll={handleScroll}
+    >
+      <article className="prose max-w-3xl mx-auto p-8 flex-1">
         <Markdown>{content}</Markdown>
       </article>
+      <button
+        className={`group sticky top-0 flex items-center justify-center w-20 h-full cursor-pointer transition-all duration-300 bg-gray-100/30 hover:bg-gray-200 hover:w-24 ${
+          reachedBottom
+            ? "opacity-100 translate-x-0"
+            : "opacity-0 translate-x-10 pointer-events-none"
+        }`}
+      >
+        <ChevronRight className="text-gray-400 transition-all duration-200 group-hover:text-gray-700 group-hover:translate-x-0.5 group-active:translate-x-1" />
+      </button>
     </div>
   );
 }
