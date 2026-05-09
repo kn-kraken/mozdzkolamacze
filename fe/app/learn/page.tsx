@@ -22,8 +22,10 @@ There are many variations of passages of Lorem Ipsum available, but the majority
 
 export default function LearnPage() {
   return (
-    <article className="prose max-w-3xl mx-auto p-8">
-      <Markdown>{content}</Markdown>
-    </article>
+    <div className="overflow-auto h-full">
+      <article className="prose max-w-3xl mx-auto p-8">
+        <Markdown>{content}</Markdown>
+      </article>
+    </div>
   );
 }
