@@ -1,0 +1,76 @@
+### Create session
+
+POST /session
+
+> {%
+# Set-Cookie: sessionId=02d9953d8adde451899be54638820b8e  
+%}
+
+
+### Get chunks
+
+GET /chunks
+Cookie: sessionId=02d9953d8adde451899be54638820b8e
+Content-Type: application/pdf
+
+
+> {%
+[
+  {
+    "id": "0ff0c836-529a-418f-8ffa-12538b5d5a55",
+    "title": "Zasady dynamiki",
+    "start": {"page": 1, "height": 0.6},
+    "end": {"page": 5, "height": 0.9},
+    "children": [
+      {
+        "id": "8e4807b7-f214-417c-9359-330be19149a0",
+        "title": "I Zasada dynamiki",
+        "start": {"page": 1, "height": 0.6},
+        "end": {"page": 2, "height": 0.2},
+      },
+      {
+        "id": "8e4807b7-f214-417c-9359-330be19149a0",
+        "title": "II Zasada dynamiki",
+        "start": {"page": 2, "height": 0.2},
+        "end": {"page": 4, "height": 0.6},
+      },
+      {
+        "id": "8e4807b7-f214-417c-9359-330be19149a0",
+        "title": "III Zasada dynamiki",
+        "start": {"page": 4, "height": 0.6},
+        "end": {"page": 5, "height": 0.9},
+      },
+    ]
+  },
+  {
+    "id": "0ff0c836-529a-418f-8ffa-12538b5d5a55",
+    "title": "Termodynamika",
+    "start": {"page": 6, "height": 0.0},
+    "end": {"page": 10, "height": 0.9},
+    "children": [
+      // ...
+    ]
+  }
+]
+%}
+
+### Evaluate summary
+
+POST /chunk/{{chunkId}}/summary-evaluation
+Cookie: sessionId=02d9953d8adde451899be54638820b8e 
+Content-Type: application/json
+
+{
+  "summary": "Kiedy ciało bla bla..."
+}
+
+> {%
+// Status 200
+%}
+
+> {%
+// Status 400
+{
+  "hint": "Zapomniałeś o ..."
+}
+%}
