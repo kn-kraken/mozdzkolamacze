@@ -38,15 +38,15 @@ export default function LearnPage() {
 
   return (
     <div
-      className="flex h-full overflow-auto"
+      className="relative h-full overflow-auto"
       ref={scrollRef}
       onScroll={handleScroll}
     >
-      <article className="prose max-w-3xl mx-auto p-8 flex-1">
+      <article className="prose max-w-3xl mx-auto p-8 mb-20">
         <Markdown>{content}</Markdown>
       </article>
       <button
-        className={`group sticky top-0 flex items-center justify-center w-20 h-full cursor-pointer transition-all duration-300 bg-gray-100/30 hover:bg-gray-200 hover:w-24 ${
+        className={`group fixed right-0 top-0 flex items-center justify-center w-20 h-full cursor-pointer transition-all duration-300 bg-gray-100/30 hover:bg-gray-200 hover:w-24 ${
           reachedBottom
             ? "opacity-100 translate-x-0"
             : "opacity-0 translate-x-10 pointer-events-none"
