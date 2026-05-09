@@ -12,6 +12,7 @@ POST /session
 GET /chunks
 Cookie: sessionId=02d9953d8adde451899be54638820b8e
 Content-Type: application/pdf
+Accept: application/json
 
 
 > {%
@@ -44,11 +45,24 @@ Content-Type: application/pdf
 ]
 %}
 
+### Get chunk content (markdown)
+
+GET /chunk/{{chunkId}}
+Cookie: sessionId=02d9953d8adde451899be54638820b8e 
+Accept: text/markdown
+
+> {%
+## I Zasada dynamiki
+
+bla bla
+%}
+
 ### Evaluate summary
 
 POST /chunk/{{chunkId}}/summary-evaluation
 Cookie: sessionId=02d9953d8adde451899be54638820b8e 
 Content-Type: application/json
+Accept: application/json
 
 {
   "summary": "Kiedy ciało bla bla..."
