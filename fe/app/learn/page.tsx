@@ -89,6 +89,7 @@ As an example of the previous algorithm consider adding the following sequence o
 
 export default function LearnPage() {
   const [reachedBottom, setReachedBottom] = useState(false);
+  const [blurred, setBlurred] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = useCallback(() => {
@@ -105,10 +106,13 @@ export default function LearnPage() {
       ref={scrollRef}
       onScroll={handleScroll}
     >
-      <article className="prose max-w-3xl mx-auto p-8 mb-6">
+      <article
+        className={`prose max-w-3xl mx-auto p-8 mb-6 transition-all duration-300 ${blurred ? "blur-sm" : ""}`}
+      >
         <Markdown urlTransform={(url) => url}>{content}</Markdown>
       </article>
       <button
+        onClick={() => setBlurred(!blurred)}
         className={`group fixed right-0 top-0 flex items-center justify-center w-20 h-full cursor-pointer transition-all duration-300 bg-gray-100/30 hover:bg-gray-200 hover:w-24 ${
           reachedBottom
             ? "opacity-100 translate-x-0"
