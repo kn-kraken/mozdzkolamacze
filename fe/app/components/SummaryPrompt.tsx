@@ -2,7 +2,7 @@
 
 import { Loader2, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useChunks } from "../learn/ChunksContext";
 
 export default function SummaryPrompt({
@@ -15,8 +15,15 @@ export default function SummaryPrompt({
   const [answer, setAnswer] = useState("");
   const [hint, setHint] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [hasEvaluated, setHasEvaluated] = useState(false);
   const router = useRouter();
   const { currentChunkId, nextChunkId, isNextOnlyLeaf } = useChunks();
+
+  useEffect(() => {
+    setHasEvaluated(false);
+    setAnswer("");
+    setHint(null);
+  }, [currentChunkId]);
 
   const goToNext = () => {
     if (nextChunkId) {
@@ -55,6 +62,7 @@ export default function SummaryPrompt({
       setHint("Failed to submit summary. Please check your connection.");
     } finally {
       setLoading(false);
+      setHasEvaluated(true);
     }
   };
 
@@ -101,19 +109,21 @@ export default function SummaryPrompt({
           </div>
         )}
 
-        <div className="flex justify-between w-full mt-6">
-          <button
-            disabled={loading}
-            onClick={exit}
-            className="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50"
-          >
-            Exit
-          </button>
+        <div className={`flex ${hasEvaluated ? "justify-between" : "justify-end"} w-full mt-6`}>
+          {hasEvaluated && (
+            <button
+              disabled={loading}
+              onClick={exit}
+              className="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50"
+            >
+              Exit
+            </button>
+          )}
 
           <button
             disabled={!answer.trim() || loading}
             onClick={handleSubmit}
-            className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg cursor-pointer transition-all duration-200 hover:bg-blue-700 active:bg-blue-800 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+            className={`px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg cursor-pointer transition-all duration-200 hover:bg-blue-700 active:bg-blue-800 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-sm hover:shadow-md ${!hasEvaluated ? "w-full" : ""}`}
           >
             Submit Summary
           </button>
