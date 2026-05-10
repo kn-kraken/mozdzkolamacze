@@ -10,6 +10,7 @@ type ChunksContextType = {
   setChunks: (chunks: Chunk[]) => void;
   currentChunkId: string | null;
   nextChunkId: string | null;
+  isNextOnlyLeaf: boolean;
   onlyLeaf: boolean;
 };
 
@@ -18,6 +19,7 @@ const ChunksContext = createContext<ChunksContextType>({
   setChunks: () => {},
   currentChunkId: null,
   nextChunkId: null,
+  isNextOnlyLeaf: false,
   onlyLeaf: true,
 });
 
@@ -36,6 +38,33 @@ function flattenLeafIds(items: Chunk[]): string[] {
     }
   }
   return result;
+}
+
+function findChunk(items: Chunk[], targetId: string): Chunk | null {
+  for (const item of items) {
+    if (item.id === targetId) return item;
+    const found = findChunk(item.children ?? [], targetId);
+    if (found) return found;
+  }
+  return null;
+}
+
+function firstLeafId(chunk: Chunk): string {
+  const children = chunk.children ?? [];
+  if (children.length === 0) return chunk.id;
+  return firstLeafId(children[0]);
+}
+
+function findParent(items: Chunk[], targetId: string): Chunk | null {
+  for (const item of items) {
+    const children = item.children ?? [];
+    for (const child of children) {
+      if (child.id === targetId) return item;
+    }
+    const found = findParent(children, targetId);
+    if (found) return found;
+  }
+  return null;
 }
 
 export function ChunksProvider({ children }: { children: React.ReactNode }) {
@@ -73,13 +102,40 @@ export function ChunksProvider({ children }: { children: React.ReactNode }) {
     init();
   }, []);
 
-  const nextChunkId = useMemo(() => {
+  const { nextChunkId, isNextOnlyLeaf } = useMemo(() => {
     const currentId = params?.chunkId;
-    if (!currentId || chunks.length === 0) return null;
+    if (!currentId || chunks.length === 0)
+      return { nextChunkId: null, isNextOnlyLeaf: false };
+
+    const parent = findParent(chunks, currentId);
+    const siblings = parent?.children ?? chunks;
+    const siblingIdx = siblings.findIndex((s) => s.id === currentId);
+
+    if (!onlyLeaf) {
+      // In section summary mode, next is the next sibling
+      if (siblingIdx !== -1 && siblingIdx < siblings.length - 1) {
+        return { nextChunkId: siblings[siblingIdx + 1].id, isNextOnlyLeaf: false };
+      }
+      return { nextChunkId: null, isNextOnlyLeaf: false };
+    }
+
+    // If current node is a parent, next should be its first leaf child
+    const currentChunk = findChunk(chunks, currentId);
+    if (currentChunk && currentChunk.children && currentChunk.children.length > 0) {
+      return { nextChunkId: firstLeafId(currentChunk), isNextOnlyLeaf: false };
+    }
+
+    const isLastChild = siblingIdx === siblings.length - 1 && siblings.length > 0;
+
+    if (isLastChild && parent) {
+      return { nextChunkId: parent.id, isNextOnlyLeaf: true };
+    }
+
     const flat = flattenLeafIds(chunks);
     const idx = flat.indexOf(currentId);
-    return idx !== -1 && idx < flat.length - 1 ? flat[idx + 1] : null;
-  }, [chunks, params?.chunkId]);
+    const next = idx !== -1 && idx < flat.length - 1 ? flat[idx + 1] : null;
+    return { nextChunkId: next, isNextOnlyLeaf: false };
+  }, [chunks, params?.chunkId, onlyLeaf]);
 
   if (loading) {
     return (
@@ -96,6 +152,7 @@ export function ChunksProvider({ children }: { children: React.ReactNode }) {
         setChunks,
         currentChunkId: params?.chunkId ?? null,
         nextChunkId,
+        isNextOnlyLeaf,
         onlyLeaf,
       }}
     >

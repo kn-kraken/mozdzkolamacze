@@ -14,9 +14,19 @@ export default function SummaryPrompt({
   const [answer, setAnswer] = useState("");
   const [hint, setHint] = useState<string | null>(null);
   const router = useRouter();
-  const { currentChunkId, nextChunkId } = useChunks();
+  const { currentChunkId, nextChunkId, isNextOnlyLeaf } = useChunks();
+
+  const goToNext = () => {
+    if (nextChunkId) {
+      router.push(`/learn/${nextChunkId}${isNextOnlyLeaf ? "?onlyLeaf=false" : ""}`);
+    }
+  };
 
   const handleSubmit = async () => {
+    if (answer.trim() === "next") {
+      goToNext();
+      return;
+    }
     const res = await fetch(
       `http://localhost:8000/chunk/${currentChunkId}/summary-evaluation`,
       {
@@ -26,8 +36,8 @@ export default function SummaryPrompt({
         body: JSON.stringify({ summary: answer }),
       },
     );
-    if (res.ok && nextChunkId) {
-      router.push(`/learn/${nextChunkId}`);
+    if (res.ok) {
+      goToNext();
     } else {
       const data = await res.json();
       setAnswer("");
