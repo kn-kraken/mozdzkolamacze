@@ -31,6 +31,12 @@ export function ChunksProvider({ children }: { children: React.ReactNode }) {
           credentials: "include",
         });
       }
+      const res = await fetch("http://localhost:8000/chunks", {
+        credentials: "include",
+      });
+      const data: Chunk[] = await res.json();
+      console.log(data);
+      setChunks(data);
       setLoading(false);
     }
     init();
