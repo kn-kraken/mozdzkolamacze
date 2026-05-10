@@ -2,15 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useChunks } from "../learn/ChunksContext";
 
 export default function SummaryPrompt({ visible, exit }: { visible: boolean; exit: () => void }) {
   const [answer, setAnswer] = useState("");
   const [repeat, setRepeat] = useState(false);
   const router = useRouter();
+  const { nextChunkId } = useChunks();
 
   const handleSubmit = () => {
-    if (Math.random() < 0.5) {
-      router.push(`/learn/${crypto.randomUUID()}`);
+    if (Math.random() < 0.5 && nextChunkId) {
+      router.push(`/learn/${nextChunkId}`);
     } else {
       console.log("Summary failed");
       // alert("Summary not accurate. Please try again.");

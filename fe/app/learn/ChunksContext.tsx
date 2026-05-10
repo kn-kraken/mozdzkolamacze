@@ -2,16 +2,21 @@
 
 import { Chunk } from "@/lib/types";
 import { Loader2 } from "lucide-react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 type ChunksContextType = {
   chunks: Chunk[];
   setChunks: (chunks: Chunk[]) => void;
+  currentChunkId: string | null;
+  nextChunkId: string | null;
 };
 
 const ChunksContext = createContext<ChunksContextType>({
   chunks: [],
   setChunks: () => {},
+  currentChunkId: null,
+  nextChunkId: null,
 });
 
 function getCookie(name: string): string | undefined {
@@ -19,9 +24,22 @@ function getCookie(name: string): string | undefined {
   return match?.[1];
 }
 
+function flattenLeafIds(items: Chunk[]): string[] {
+  const result: string[] = [];
+  for (const item of items) {
+    if (item.children.length === 0) {
+      result.push(item.id);
+    } else {
+      result.push(...flattenLeafIds(item.children));
+    }
+  }
+  return result;
+}
+
 export function ChunksProvider({ children }: { children: React.ReactNode }) {
   const [chunks, setChunks] = useState<Chunk[]>([]);
   const [loading, setLoading] = useState(true);
+  const params = useParams<{ chunkId?: string }>();
 
   useEffect(() => {
     async function init() {
@@ -42,6 +60,14 @@ export function ChunksProvider({ children }: { children: React.ReactNode }) {
     init();
   }, []);
 
+  const nextChunkId = useMemo(() => {
+    const currentId = params?.chunkId;
+    if (!currentId || chunks.length === 0) return null;
+    const flat = flattenLeafIds(chunks);
+    const idx = flat.indexOf(currentId);
+    return idx !== -1 && idx < flat.length - 1 ? flat[idx + 1] : null;
+  }, [chunks, params?.chunkId]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -51,7 +77,7 @@ export function ChunksProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ChunksContext.Provider value={{ chunks, setChunks }}>
+    <ChunksContext.Provider value={{ chunks, setChunks, currentChunkId: params?.chunkId ?? null, nextChunkId }}>
       {children}
     </ChunksContext.Provider>
   );
