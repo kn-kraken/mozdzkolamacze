@@ -4,20 +4,34 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useChunks } from "../learn/ChunksContext";
 
-export default function SummaryPrompt({ visible, exit }: { visible: boolean; exit: () => void }) {
+export default function SummaryPrompt({
+  visible,
+  exit,
+}: {
+  visible: boolean;
+  exit: () => void;
+}) {
   const [answer, setAnswer] = useState("");
-  const [repeat, setRepeat] = useState(false);
+  const [hint, setHint] = useState<string | null>(null);
   const router = useRouter();
-  const { nextChunkId } = useChunks();
+  const { currentChunkId, nextChunkId } = useChunks();
 
-  const handleSubmit = () => {
-    if (Math.random() < 0.5 && nextChunkId) {
+  const handleSubmit = async () => {
+    const res = await fetch(
+      `http://localhost:8000/chunk/${currentChunkId}/summary-evaluation`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ summary: answer }),
+      },
+    );
+    if (res.ok && nextChunkId) {
       router.push(`/learn/${nextChunkId}`);
     } else {
-      console.log("Summary failed");
-      // alert("Summary not accurate. Please try again.");
+      const data = await res.json();
       setAnswer("");
-      setRepeat(true);
+      setHint(data.detail?.hint ?? "Summary not accurate. Please try again.");
     }
   };
 
@@ -38,11 +52,14 @@ export default function SummaryPrompt({ visible, exit }: { visible: boolean; exi
           rows={4}
           placeholder="Type your summary here..."
           value={answer}
-          onChange={(e) => {setAnswer(e.target.value); setRepeat(false);}}
+          onChange={(e) => {
+            setAnswer(e.target.value);
+            setHint(null);
+          }}
         />
         <div className="mt-2 text-sm text-red-600">
           <label className="block text-lg font-semibold mb-2 color-red-500">
-            {repeat ? "Summary not accurate. Please try again." : ""}
+            {hint ?? ""}
           </label>
         </div>
         <div className="flex justify-between w-full">
@@ -52,7 +69,7 @@ export default function SummaryPrompt({ visible, exit }: { visible: boolean; exi
           >
             Exit
           </button>
-          
+
           <button
             suppressHydrationWarning
             disabled={!answer.trim()}
