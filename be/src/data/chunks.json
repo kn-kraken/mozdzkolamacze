@@ -2,7 +2,7 @@
   {
     "id": "f331810d-0f9e-428e-8fc5-24634dc742b1",
     "title": "2 Linked Lists",
-    "content": "",
+    "content": "Linked lists are one of the most fundamental data structures in computer science. Unlike arrays, which store elements in a contiguous block of memory, linked lists are composed of nodes, where each node contains a value and a reference to the next node in the sequence. This organization allows for dynamic memory management and flexible insertion or removal of elements without the need to shift surrounding data. In this chapter, you will explore two main variants of linked lists: singly linked lists, where each node points only to its successor, and doubly linked lists, where nodes maintain references to both the previous and the next node. We will cover the core operations — insertion, searching, deletion, and traversal (including reverse traversal) — analyzing both their implementation and computational complexity. Understanding linked lists provides a solid foundation for learning more advanced data structures such as stacks, queues, and trees, all of which often rely on linked list principles under the hood.",
     "children": [
       {
         "id": "3af4dd40-5cda-4e30-97bf-6df8902c321c",
