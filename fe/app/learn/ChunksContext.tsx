@@ -114,18 +114,26 @@ export function ChunksProvider({ children }: { children: React.ReactNode }) {
     if (!onlyLeaf) {
       // In section summary mode, next is the next sibling
       if (siblingIdx !== -1 && siblingIdx < siblings.length - 1) {
-        return { nextChunkId: siblings[siblingIdx + 1].id, isNextOnlyLeaf: false };
+        return {
+          nextChunkId: siblings[siblingIdx + 1].id,
+          isNextOnlyLeaf: false,
+        };
       }
       return { nextChunkId: null, isNextOnlyLeaf: false };
     }
 
     // If current node is a parent, next should be its first leaf child
     const currentChunk = findChunk(chunks, currentId);
-    if (currentChunk && currentChunk.children && currentChunk.children.length > 0) {
+    if (
+      currentChunk &&
+      currentChunk.children &&
+      currentChunk.children.length > 0
+    ) {
       return { nextChunkId: firstLeafId(currentChunk), isNextOnlyLeaf: false };
     }
 
-    const isLastChild = siblingIdx === siblings.length - 1 && siblings.length > 0;
+    const isLastChild =
+      siblingIdx === siblings.length - 1 && siblings.length > 0;
 
     if (isLastChild && parent) {
       return { nextChunkId: parent.id, isNextOnlyLeaf: true };
