@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
-function firstLeafId(chunks: { id: string; children: any[] }[]): string | null {
+function firstLeafId(chunks: { id: string; children?: any[] }[]): string | null {
   for (const chunk of chunks) {
-    if (chunk.children.length === 0) return chunk.id;
+    if (!chunk.children || chunk.children.length === 0) return chunk.id;
     const child = firstLeafId(chunk.children);
     if (child) return child;
   }

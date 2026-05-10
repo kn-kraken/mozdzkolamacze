@@ -28,7 +28,8 @@ function TreeItem({
   currentChunkId: string | null;
 }) {
   const [isOpen, setIsOpen] = useState(true);
-  const isLeaf = item.children.length === 0;
+  const children = item.children ?? [];
+  const isLeaf = children.length === 0;
   const isActive = isLeaf && item.id === currentChunkId;
 
   if (isLeaf) {
@@ -56,7 +57,7 @@ function TreeItem({
 
       {isOpen && (
         <div className="ml-4 mt-1 flex flex-col gap-1 border-l pl-2">
-          {item.children.map((child) => (
+          {children.map((child) => (
             <TreeItem
               key={child.id}
               item={child}

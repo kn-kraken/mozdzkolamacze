@@ -27,7 +27,7 @@ function getCookie(name: string): string | undefined {
 function flattenLeafIds(items: Chunk[]): string[] {
   const result: string[] = [];
   for (const item of items) {
-    if (item.children.length === 0) {
+    if (!item.children || item.children.length === 0) {
       result.push(item.id);
     } else {
       result.push(...flattenLeafIds(item.children));
@@ -49,9 +49,18 @@ export function ChunksProvider({ children }: { children: React.ReactNode }) {
           credentials: "include",
         });
       }
-      const res = await fetch("http://localhost:8000/chunks", {
+      let res = await fetch("http://localhost:8000/chunks", {
         credentials: "include",
       });
+      if (res.status === 401) {
+        await fetch("http://localhost:8000/session", {
+          method: "POST",
+          credentials: "include",
+        });
+        res = await fetch("http://localhost:8000/chunks", {
+          credentials: "include",
+        });
+      }
       const data: Chunk[] = await res.json();
       console.log(data);
       setChunks(data);
@@ -77,7 +86,14 @@ export function ChunksProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ChunksContext.Provider value={{ chunks, setChunks, currentChunkId: params?.chunkId ?? null, nextChunkId }}>
+    <ChunksContext.Provider
+      value={{
+        chunks,
+        setChunks,
+        currentChunkId: params?.chunkId ?? null,
+        nextChunkId,
+      }}
+    >
       {children}
     </ChunksContext.Provider>
   );
