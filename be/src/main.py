@@ -2,12 +2,21 @@ import json
 import uuid
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Cookie, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from src.chunking import extract_markdown, build_chunks
 from src.evaluation import evaluate_summary
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 IMAGES_DIR = Path(__file__).parent / "images"
 IMAGES_DIR.mkdir(exist_ok=True)
