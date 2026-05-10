@@ -36,6 +36,14 @@ export default function LearnPage({
     }
   }, [reachedBottom]);
 
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !content || reachedBottom) return;
+    if (el.scrollHeight <= el.clientHeight) {
+      setReachedBottom(true);
+    }
+  }, [content, reachedBottom]);
+
   if (content === null) {
     return (
       <div className="flex items-center justify-center h-full">
