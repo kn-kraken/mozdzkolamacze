@@ -2,6 +2,7 @@
 
 import { Chunk } from "@/lib/types";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useChunks } from "../learn/ChunksContext";
 
@@ -28,6 +29,8 @@ function TreeItem({
   currentChunkId: string | null;
 }) {
   const [isOpen, setIsOpen] = useState(true);
+  const { onlyLeaf } = useChunks();
+  const router = useRouter();
   const children = item.children ?? [];
   const isLeaf = children.length === 0;
   const isActive = item.id === currentChunkId;
@@ -47,7 +50,9 @@ function TreeItem({
 
   return (
     <div className="mb-2">
-      <div className={`flex items-center gap-1 p-1 rounded ${isActive ? "bg-gray-200" : ""}`}>
+      <div
+        className={`flex items-center gap-1 p-1 rounded ${isActive ? "bg-gray-200" : ""}`}
+      >
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="hover:bg-gray-300 rounded px-1"
@@ -55,7 +60,13 @@ function TreeItem({
           {isOpen ? "▼" : "▶"}
         </button>
         <Link
-          href={`/learn/${item.id}`}
+          href={`/learn/${item.id}${isActive ? (onlyLeaf ? "?onlyLeaf=false" : "") : ""}`}
+          onClick={(e) => {
+            if (isActive) {
+              e.preventDefault();
+              router.push(`/learn/${item.id}${onlyLeaf ? "?onlyLeaf=false" : ""}`);
+            }
+          }}
           className={`font-medium hover:bg-gray-200 rounded px-1 flex-1 ${isActive ? "font-semibold" : ""}`}
         >
           {item.title}

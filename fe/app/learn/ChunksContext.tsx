@@ -2,7 +2,7 @@
 
 import { Chunk } from "@/lib/types";
 import { Loader2 } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 type ChunksContextType = {
@@ -10,6 +10,7 @@ type ChunksContextType = {
   setChunks: (chunks: Chunk[]) => void;
   currentChunkId: string | null;
   nextChunkId: string | null;
+  onlyLeaf: boolean;
 };
 
 const ChunksContext = createContext<ChunksContextType>({
@@ -17,6 +18,7 @@ const ChunksContext = createContext<ChunksContextType>({
   setChunks: () => {},
   currentChunkId: null,
   nextChunkId: null,
+  onlyLeaf: true,
 });
 
 function getCookie(name: string): string | undefined {
@@ -40,6 +42,8 @@ export function ChunksProvider({ children }: { children: React.ReactNode }) {
   const [chunks, setChunks] = useState<Chunk[]>([]);
   const [loading, setLoading] = useState(true);
   const params = useParams<{ chunkId?: string }>();
+  const searchParams = useSearchParams();
+  const onlyLeaf = searchParams.get("onlyLeaf") !== "false";
 
   useEffect(() => {
     async function init() {
@@ -92,6 +96,7 @@ export function ChunksProvider({ children }: { children: React.ReactNode }) {
         setChunks,
         currentChunkId: params?.chunkId ?? null,
         nextChunkId,
+        onlyLeaf,
       }}
     >
       {children}
