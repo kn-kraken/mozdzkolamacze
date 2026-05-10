@@ -117,7 +117,7 @@ export default function LearnPage({
       >
         <Markdown urlTransform={(url) => url}>{content}</Markdown>
       </article>
-      <SummaryPrompt visible={blurred} />
+      <SummaryPrompt visible={blurred} exit={() => setBlurred(false)} />
       <button
         onClick={() => setBlurred(!blurred)}
         className={`group fixed right-0 top-0 flex items-center justify-center w-20 h-full cursor-pointer transition-all duration-300 bg-gray-100/30 hover:bg-gray-200 hover:w-24 ${

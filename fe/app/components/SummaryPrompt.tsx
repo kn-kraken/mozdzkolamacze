@@ -3,13 +3,19 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function SummaryPrompt({ visible }: { visible: boolean }) {
+export default function SummaryPrompt({ visible, exit }: { visible: boolean; exit: () => void }) {
   const [answer, setAnswer] = useState("");
+  const [repeat, setRepeat] = useState(false);
   const router = useRouter();
 
   const handleSubmit = () => {
     if (Math.random() < 0.5) {
       router.push(`/learn/${crypto.randomUUID()}`);
+    } else {
+      console.log("Summary failed");
+      // alert("Summary not accurate. Please try again.");
+      setAnswer("");
+      setRepeat(true);
     }
   };
 
@@ -30,9 +36,21 @@ export default function SummaryPrompt({ visible }: { visible: boolean }) {
           rows={4}
           placeholder="Type your summary here..."
           value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
+          onChange={(e) => {setAnswer(e.target.value); setRepeat(false);}}
         />
-        <div className="flex justify-end">
+        <div className="mt-2 text-sm text-red-600">
+          <label className="block text-lg font-semibold mb-2 color-red-500">
+            {repeat ? "Summary not accurate. Please try again." : ""}
+          </label>
+        </div>
+        <div className="flex justify-between w-full">
+          <button
+            onClick={exit}
+            className="mt-3 px-6 py-2 bg-red-500 text-white font-semibold rounded-lg cursor-pointer transition-colors duration-200 hover:bg-red-600 active:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            Exit
+          </button>
+          
           <button
             suppressHydrationWarning
             disabled={!answer.trim()}

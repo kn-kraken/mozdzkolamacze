@@ -6,17 +6,17 @@ import Link from 'next/link';
 
 const MOCK_DATA = [
   {
-    title: 'Podstawy Reacta',
+    title: 'Getting Started',
     children: [
-      { title: 'Komponenty', href: '/learn/components' },
-      { title: 'Propsy', href: '/learn/props' },
+      { title: 'Components' },
+      { title: 'Props' },
     ],
   },
   {
-    title: 'Zaawansowane',
+    title: 'Linked Lists',
     children: [
-      { title: 'Hooks', href: '/learn/hooks' },
-      { title: 'Context API', href: '/learn/context' },
+      { title: 'Singly Linked Lists' },
+      { title: 'Insertion'},
     ],
   },
 ];
@@ -50,13 +50,9 @@ function TreeItem({ item }: { item: any }) {
       {isOpen && item.children && (
         <div className="ml-4 mt-1 flex flex-col gap-1 border-l pl-2">
           {item.children.map((child: any, idx: number) => (
-            <Link 
-              key={idx} 
-              href={child.href}
-              className="text-sm text-blue-600 hover:underline py-1"
-            >
+            <p key={idx} className="hover:bg-gray-200 p-1 rounded cursor-pointer">
               {child.title}
-            </Link>
+            </p>
           ))}
         </div>
       )}
