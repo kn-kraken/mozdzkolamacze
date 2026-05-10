@@ -1,4 +1,4 @@
-# Braincrackers backend
+# Braincrackers frontend
 
 ## Requirements
 
