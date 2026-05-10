@@ -45,12 +45,16 @@ def _find_chunk(chunks: list, chunk_id: str) -> dict | None:
 def _load_chunks() -> list:
     if CHUNKS_CACHE.exists():
         print("[session] Loading chunks from chunks.json cache")
-        return json.loads(CHUNKS_CACHE.read_text())
+        return json.loads(CHUNKS_CACHE.read_text(encoding='utf-8')) 
+    
     print(f"[session] Extracting markdown from {PDF_PATH}...")
     md = extract_markdown(str(PDF_PATH))
+    
     print(f"[session] Markdown length: {len(md)} chars, building chunks...")
     chunks = build_chunks(md)
-    CHUNKS_CACHE.write_text(json.dumps(chunks, ensure_ascii=False, indent=2))
+    
+    CHUNKS_CACHE.write_text(json.dumps(chunks, ensure_ascii=False, indent=2), encoding='utf-8')
+    
     print(f"[session] Built {len(chunks)} chunks, saved to chunks.json")
     return chunks
 
