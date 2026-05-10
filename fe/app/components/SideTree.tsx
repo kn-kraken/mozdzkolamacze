@@ -24,9 +24,11 @@ export default function SideTree() {
 function TreeItem({
   item,
   currentChunkId,
+  highlighted,
 }: {
   item: Chunk;
   currentChunkId: string | null;
+  highlighted?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(true);
   const { onlyLeaf } = useChunks();
@@ -34,13 +36,14 @@ function TreeItem({
   const children = item.children ?? [];
   const isLeaf = children.length === 0;
   const isActive = item.id === currentChunkId;
+  const isHighlighted = highlighted || (!onlyLeaf && isActive);
 
   if (isLeaf) {
     return (
       <Link
         href={`/learn/${item.id}`}
         className={`block hover:bg-gray-200 p-1 rounded cursor-pointer ${
-          isActive ? "bg-gray-200 font-semibold" : ""
+          isActive ? "bg-gray-200 font-semibold" : isHighlighted ? "bg-gray-100 font-semibold" : ""
         }`}
       >
         {item.title}
@@ -51,7 +54,7 @@ function TreeItem({
   return (
     <div className="mb-2">
       <div
-        className={`flex items-center gap-1 p-1 rounded ${isActive ? "bg-gray-200" : ""}`}
+        className={`flex items-center gap-1 p-1 rounded ${isActive ? "bg-gray-200" : isHighlighted ? "bg-gray-100" : ""}`}
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -67,7 +70,7 @@ function TreeItem({
               router.push(`/learn/${item.id}${onlyLeaf ? "?onlyLeaf=false" : ""}`);
             }
           }}
-          className={`font-medium hover:bg-gray-200 rounded px-1 flex-1 ${isActive ? "font-semibold" : ""}`}
+          className={`font-medium hover:bg-gray-200 rounded px-1 flex-1 ${isActive || isHighlighted ? "font-semibold" : ""}`}
         >
           {item.title}
         </Link>
@@ -80,6 +83,7 @@ function TreeItem({
               key={child.id}
               item={child}
               currentChunkId={currentChunkId}
+              highlighted={isHighlighted}
             />
           ))}
         </div>

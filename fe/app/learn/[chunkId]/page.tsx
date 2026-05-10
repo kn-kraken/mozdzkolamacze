@@ -81,7 +81,9 @@ export default function LearnPage({
         <div
           className={`max-w-3xl mx-auto p-8 transition-all duration-300 ${blurred ? "blur-sm" : ""}`}
         >
-          <h1 className="text-2xl font-bold mb-6">Summarize the whole section</h1>
+          <h1 className="text-2xl font-bold mb-6">
+            Summarize the whole section
+          </h1>
           {chunk && (
             <ul className="text-gray-700">
               <DescendantList chunk={chunk} />

@@ -45,7 +45,7 @@ export default function SummaryPrompt({
     >
       <div className="max-w-3xl w-full px-8 py-6 bg-white backdrop-blur-sm rounded-xl shadow-md">
         <label className="block text-lg font-semibold mb-2">
-          Now summarize the excerpt in one sentence
+          Now summarize the section in one sentence
         </label>
         <textarea
           className="w-full border border-gray-300 rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-gray-400"
