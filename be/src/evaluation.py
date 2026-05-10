@@ -11,7 +11,7 @@ PASS_THRESHOLD = 3.5
 
 _DIMENSIONS = {
     "consistency": {
-        "name": "Consistency (zgodność faktyczna)",
+        "name": "Consistency",
         "definition": "Does the summary contain only information present in the original? No hallucinations, distortions, or invented facts?",
         "scale": (
             "1 = Significant factual errors or information absent from the original\n"
@@ -22,7 +22,7 @@ _DIMENSIONS = {
         ),
     },
     "relevance": {
-        "name": "Relevance (trafność doboru)",
+        "name": "Relevance",
         "definition": "Did the student select the most important information, not marginal details?",
         "scale": (
             "1 = Covers only peripheral details, misses the main point\n"
@@ -33,7 +33,7 @@ _DIMENSIONS = {
         ),
     },
     "coherence": {
-        "name": "Coherence (spójność)",
+        "name": "Coherence",
         "definition": "Does the summary read as a logical whole? Do sentences connect meaningfully?",
         "scale": (
             "1 = Disjointed, hard to follow\n"
@@ -44,7 +44,7 @@ _DIMENSIONS = {
         ),
     },
     "fluency": {
-        "name": "Fluency (płynność językowa)",
+        "name": "Fluency",
         "definition": "Is the summary grammatically correct, well-written, and easy to read?",
         "scale": (
             "1 = Serious grammar or syntax errors\n"
@@ -55,7 +55,7 @@ _DIMENSIONS = {
         ),
     },
     "conciseness": {
-        "name": "Conciseness (zwięzłość)",
+        "name": "Conciseness",
         "definition": "Is the summary actually shorter and denser than the original? Does the student paraphrase in their own words rather than copy phrases?",
         "scale": (
             "1 = Largely copied from the original, no compression\n"
