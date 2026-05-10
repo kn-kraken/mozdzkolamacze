@@ -1,6 +1,7 @@
 "use client";
 
 import { Chunk } from "@/lib/types";
+import Link from "next/link";
 import { useState } from "react";
 import { useChunks } from "../learn/ChunksContext";
 
@@ -21,6 +22,18 @@ export default function SideTree() {
 
 function TreeItem({ item }: { item: Chunk }) {
   const [isOpen, setIsOpen] = useState(true);
+  const isLeaf = item.children.length === 0;
+
+  if (isLeaf) {
+    return (
+      <Link
+        href={`/learn/${item.id}`}
+        className="block hover:bg-gray-200 p-1 rounded cursor-pointer"
+      >
+        {item.title}
+      </Link>
+    );
+  }
 
   return (
     <div className="mb-2">
@@ -32,15 +45,10 @@ function TreeItem({ item }: { item: Chunk }) {
         <span className="font-medium">{item.title}</span>
       </button>
 
-      {isOpen && item.children.length > 0 && (
+      {isOpen && (
         <div className="ml-4 mt-1 flex flex-col gap-1 border-l pl-2">
           {item.children.map((child) => (
-            <p
-              key={child.id}
-              className="hover:bg-gray-200 p-1 rounded cursor-pointer"
-            >
-              {child.title}
-            </p>
+            <TreeItem key={child.id} item={child} />
           ))}
         </div>
       )}
