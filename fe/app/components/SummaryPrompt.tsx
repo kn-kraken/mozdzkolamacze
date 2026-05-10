@@ -16,9 +16,22 @@ export default function SummaryPrompt({
   const [hint, setHint] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { currentChunkId, nextChunkId } = useChunks();
+  const { currentChunkId, nextChunkId, isNextOnlyLeaf } = useChunks();
+
+  const goToNext = () => {
+    if (nextChunkId) {
+      router.push(`/learn/${nextChunkId}${isNextOnlyLeaf ? "?onlyLeaf=false" : ""}`);
+    } else {
+      router.push("/learn");
+    }
+  };
 
   const handleSubmit = async () => {
+    if (answer.trim() === "next") {
+      goToNext();
+      return;
+    }
+
     setLoading(true);
     setHint(null);
     try {
@@ -32,11 +45,7 @@ export default function SummaryPrompt({
         },
       );
       if (res.ok) {
-        if (nextChunkId) {
-          router.push(`/learn/${nextChunkId}`);
-        } else {
-          router.push("/learn");
-        }
+        goToNext();
         setAnswer("");
       } else {
         const data = await res.json();
@@ -76,7 +85,7 @@ export default function SummaryPrompt({
         {loading && (
           <div className="mt-4 flex items-center gap-3 text-blue-600 animate-pulse">
             <Loader2 className="w-5 h-5 animate-spin" />
-            <span className="text-sm font-medium">Evaluating your summary...</span>
+            <span className="text-sm font-medium">Evaluating your summary with AI...</span>
           </div>
         )}
 
