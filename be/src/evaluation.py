@@ -89,7 +89,7 @@ Instructions:
 1. Reason through this dimension step by step (2-4 sentences).
 2. Cite a specific phrase from the student's summary that best illustrates your assessment (or null if none).
 3. Give your score (integer 1-5).
-4. Write a one-sentence feedback note in the same language as the student's summary.
+4. Write a one-sentence feedback note in English. Always respond in English regardless of the language of the summary.
 
 Respond ONLY in this JSON format:
 {{
@@ -99,7 +99,7 @@ Respond ONLY in this JSON format:
   "feedback": "..."
 }}"""
 
-_TIP_PROMPT = """Based on these evaluation results for a student's summary, write ONE short actionable improvement tip (1-2 sentences) in the same language as the student's summary.
+_TIP_PROMPT = """Based on these evaluation results for a student's summary, write ONE short actionable improvement tip (1-2 sentences) in English. Always respond in English.
 
 Scores: {scores}
 Feedback notes: {feedbacks}
