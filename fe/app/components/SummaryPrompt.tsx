@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader2, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useChunks } from "../learn/ChunksContext";
@@ -13,25 +14,38 @@ export default function SummaryPrompt({
 }) {
   const [answer, setAnswer] = useState("");
   const [hint, setHint] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { currentChunkId, nextChunkId } = useChunks();
 
   const handleSubmit = async () => {
-    const res = await fetch(
-      `http://localhost:8000/chunk/${currentChunkId}/summary-evaluation`,
-      {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ summary: answer }),
-      },
-    );
-    if (res.ok && nextChunkId) {
-      router.push(`/learn/${nextChunkId}`);
-    } else {
-      const data = await res.json();
-      setAnswer("");
-      setHint(data.detail?.hint ?? "Summary not accurate. Please try again.");
+    setLoading(true);
+    setHint(null);
+    try {
+      const res = await fetch(
+        `http://localhost:8000/chunk/${currentChunkId}/summary-evaluation`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ summary: answer }),
+        },
+      );
+      if (res.ok) {
+        if (nextChunkId) {
+          router.push(`/learn/${nextChunkId}`);
+        } else {
+          router.push("/learn");
+        }
+        setAnswer("");
+      } else {
+        const data = await res.json();
+        setHint(data.detail?.tip ?? "Summary not accurate. Please try again.");
+      }
+    } catch (err) {
+      setHint("Failed to submit summary. Please check your connection.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,12 +57,13 @@ export default function SummaryPrompt({
           : "opacity-0 translate-y-4 pointer-events-none"
       }`}
     >
-      <div className="max-w-3xl w-full px-8 py-6 bg-white backdrop-blur-sm rounded-xl shadow-md">
+      <div className="max-w-3xl w-full px-8 py-6 bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-100">
         <label className="block text-lg font-semibold mb-2">
           Now summarize the section in one sentence
         </label>
         <textarea
-          className="w-full border border-gray-300 rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-gray-400"
+          disabled={loading}
+          className="w-full border border-gray-300 rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:bg-gray-50 disabled:text-gray-500 transition-all"
           rows={4}
           placeholder="Type your summary here..."
           value={answer}
@@ -57,26 +72,41 @@ export default function SummaryPrompt({
             setHint(null);
           }}
         />
-        <div className="mt-2 text-sm text-red-600">
-          <label className="block text-lg font-semibold mb-2 color-red-500">
-            {hint ?? ""}
-          </label>
-        </div>
-        <div className="flex justify-between w-full">
+
+        {loading && (
+          <div className="mt-4 flex items-center gap-3 text-blue-600 animate-pulse">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span className="text-sm font-medium">Evaluating your summary...</span>
+          </div>
+        )}
+
+        {hint && !loading && (
+          <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-100">
+            <div className="flex items-start gap-2">
+              <Sparkles className="w-5 h-5 text-red-500 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-red-800">Improvement Tip:</p>
+                <p className="text-sm text-red-700 mt-1 leading-relaxed">{hint}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-between w-full mt-6">
           <button
+            disabled={loading}
             onClick={exit}
-            className="mt-3 px-6 py-2 bg-red-500 text-white font-semibold rounded-lg cursor-pointer transition-colors duration-200 hover:bg-red-600 active:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50"
           >
             Exit
           </button>
 
           <button
-            suppressHydrationWarning
-            disabled={!answer.trim()}
+            disabled={!answer.trim() || loading}
             onClick={handleSubmit}
-            className="mt-3 px-6 py-2 bg-gray-500 text-white font-semibold rounded-lg cursor-pointer transition-colors duration-200 hover:bg-gray-600 active:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg cursor-pointer transition-all duration-200 hover:bg-blue-700 active:bg-blue-800 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
           >
-            Submit
+            Submit Summary
           </button>
         </div>
       </div>
