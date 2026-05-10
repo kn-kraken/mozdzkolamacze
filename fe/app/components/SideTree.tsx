@@ -10,7 +10,7 @@ export default function SideTree() {
 
   return (
     <aside className="w-64 border-r h-full overflow-auto p-4 bg-gray-50">
-      <h2 className="font-bold mb-4 text-lg">Spis treści</h2>
+      <h2 className="font-bold mb-4 text-lg">Table of concepts</h2>
       <nav>
         {chunks.map((item) => (
           <TreeItem key={item.id} item={item} currentChunkId={currentChunkId} />
