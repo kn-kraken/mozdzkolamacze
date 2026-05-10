@@ -36,9 +36,9 @@ def _find_chunk(chunks: list, chunk_id: str) -> dict | None:
     for c in chunks:
         if c["id"] == chunk_id:
             return c
-        for ch in c.get("children", []):
-            if ch["id"] == chunk_id:
-                return ch
+        found = _find_chunk(c.get("children", []), chunk_id)
+        if found:
+            return found
     return None
 
 
@@ -74,14 +74,16 @@ def get_chunks(sessionId: str = Cookie(default=None), session_id: str = None):
     if not sid or sid not in sessions:
         raise HTTPException(status_code=401, detail="Brak sesji")
     chunks = sessions[sid]["chunks"]
-    return [
-        {
-            "id": c["id"],
-            "title": c["title"],
-            "children": [{"id": ch["id"], "title": ch["title"]} for ch in c["children"]],
-        }
-        for c in chunks
-    ]
+    def strip_content(items):
+        return [
+            {
+                "id": c["id"],
+                "title": c["title"],
+                "children": strip_content(c.get("children", [])),
+            }
+            for c in items
+        ]
+    return strip_content(chunks)
 
 
 @app.get("/chunk/{chunk_id}")
