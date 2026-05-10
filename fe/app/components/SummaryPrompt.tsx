@@ -17,7 +17,7 @@ export default function SummaryPrompt({
   const [loading, setLoading] = useState(false);
   const [hasEvaluated, setHasEvaluated] = useState(false);
   const router = useRouter();
-  const { currentChunkId, nextChunkId, isNextOnlyLeaf } = useChunks();
+  const { currentChunkId, nextChunkId, isNextOnlyLeaf, markCompleted } = useChunks();
 
   useEffect(() => {
     setHasEvaluated(false);
@@ -35,6 +35,7 @@ export default function SummaryPrompt({
 
   const handleSubmit = async () => {
     if (answer.trim() === "next") {
+      if (currentChunkId) markCompleted(currentChunkId);
       goToNext();
       return;
     }
@@ -43,7 +44,7 @@ export default function SummaryPrompt({
     setHint(null);
     try {
       const res = await fetch(
-        `http://localhost:8000/chunk/${currentChunkId}/summary-evaluation`,
+        `http://localhost:8001/chunk/${currentChunkId}/summary-evaluation`,
         {
           method: "POST",
           credentials: "include",
@@ -52,6 +53,7 @@ export default function SummaryPrompt({
         },
       );
       if (res.ok) {
+        if (currentChunkId) markCompleted(currentChunkId);
         goToNext();
         setAnswer("");
       } else {

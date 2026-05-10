@@ -5,7 +5,7 @@ export default async function LearnRedirect() {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get("sessionId")?.value;
 
-  const res = await fetch("http://localhost:8000/chunks", {
+  const res = await fetch("http://localhost:8001/chunks", {
     headers: sessionId ? { Cookie: `sessionId=${sessionId}` } : {},
   });
 

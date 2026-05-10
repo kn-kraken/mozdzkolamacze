@@ -12,6 +12,8 @@ type ChunksContextType = {
   nextChunkId: string | null;
   isNextOnlyLeaf: boolean;
   onlyLeaf: boolean;
+  completedIds: Set<string>;
+  markCompleted: (id: string) => void;
 };
 
 const ChunksContext = createContext<ChunksContextType>({
@@ -21,6 +23,8 @@ const ChunksContext = createContext<ChunksContextType>({
   nextChunkId: null,
   isNextOnlyLeaf: false,
   onlyLeaf: true,
+  completedIds: new Set(),
+  markCompleted: () => {},
 });
 
 function getCookie(name: string): string | undefined {
@@ -70,6 +74,10 @@ function findParent(items: Chunk[], targetId: string): Chunk | null {
 export function ChunksProvider({ children }: { children: React.ReactNode }) {
   const [chunks, setChunks] = useState<Chunk[]>([]);
   const [loading, setLoading] = useState(true);
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+
+  const markCompleted = (id: string) =>
+    setCompletedIds((prev) => new Set(prev).add(id));
   const params = useParams<{ chunkId?: string }>();
   const searchParams = useSearchParams();
   const onlyLeaf = searchParams.get("onlyLeaf") !== "false";
@@ -77,20 +85,20 @@ export function ChunksProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function init() {
       if (!getCookie("sessionId")) {
-        await fetch("http://localhost:8000/session", {
+        await fetch("http://localhost:8001/session", {
           method: "POST",
           credentials: "include",
         });
       }
-      let res = await fetch("http://localhost:8000/chunks", {
+      let res = await fetch("http://localhost:8001/chunks", {
         credentials: "include",
       });
       if (res.status === 401) {
-        await fetch("http://localhost:8000/session", {
+        await fetch("http://localhost:8001/session", {
           method: "POST",
           credentials: "include",
         });
-        res = await fetch("http://localhost:8000/chunks", {
+        res = await fetch("http://localhost:8001/chunks", {
           credentials: "include",
         });
       }
@@ -162,6 +170,8 @@ export function ChunksProvider({ children }: { children: React.ReactNode }) {
         nextChunkId,
         isNextOnlyLeaf,
         onlyLeaf,
+        completedIds,
+        markCompleted,
       }}
     >
       {children}

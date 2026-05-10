@@ -1,5 +1,6 @@
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -137,9 +138,12 @@ def evaluate_summary(chunk_content: str, summary: str) -> dict | None:
     """
     Returns None if the summary passes, or a structured feedback dict if it fails.
     """
-    results = {}
-    for dim_key in _DIMENSIONS:
-        results[dim_key] = _eval_dimension(dim_key, chunk_content, summary)
+    with ThreadPoolExecutor(max_workers=len(_DIMENSIONS)) as executor:
+        futures = {
+            executor.submit(_eval_dimension, dim_key, chunk_content, summary): dim_key
+            for dim_key in _DIMENSIONS
+        }
+        results = {futures[f]: f.result() for f in as_completed(futures)}
 
     scores = {k: v["score"] for k, v in results.items()}
     avg = sum(scores.values()) / len(scores)

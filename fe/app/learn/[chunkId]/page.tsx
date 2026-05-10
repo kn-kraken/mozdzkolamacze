@@ -51,7 +51,7 @@ export default function LearnPage({
     setContent(null);
     setReachedBottom(false);
     setBlurred(false);
-    fetch(`http://localhost:8000/chunk/${chunkId}`, {
+    fetch(`http://localhost:8001/chunk/${chunkId}`, {
       credentials: "include",
     })
       .then((res) => res.text())

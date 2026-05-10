@@ -45,16 +45,16 @@ def _find_chunk(chunks: list, chunk_id: str) -> dict | None:
 def _load_chunks() -> list:
     if CHUNKS_CACHE.exists():
         print("[session] Loading chunks from chunks.json cache")
-        return json.loads(CHUNKS_CACHE.read_text(encoding='utf-8')) 
-    
+        return json.loads(CHUNKS_CACHE.read_text(encoding='utf-8'))
+
     print(f"[session] Extracting markdown from {PDF_PATH}...")
     md = extract_markdown(str(PDF_PATH))
-    
+
     print(f"[session] Markdown length: {len(md)} chars, building chunks...")
     chunks = build_chunks(md)
-    
+
     CHUNKS_CACHE.write_text(json.dumps(chunks, ensure_ascii=False, indent=2), encoding='utf-8')
-    
+
     print(f"[session] Built {len(chunks)} chunks, saved to chunks.json")
     return chunks
 
@@ -74,16 +74,15 @@ def get_chunks(sessionId: str = Cookie(default=None), session_id: str = None):
     if not sid or sid not in sessions:
         raise HTTPException(status_code=401, detail="Brak sesji")
     chunks = sessions[sid]["chunks"]
-    def strip_content(items):
-        return [
-            {
-                "id": c["id"],
-                "title": c["title"],
-                "children": strip_content(c.get("children", [])),
-            }
-            for c in items
-        ]
-    return strip_content(chunks)
+
+    def serialize(c):
+        return {
+            "id": c["id"],
+            "title": c["title"],
+            "children": [serialize(ch) for ch in c.get("children", [])],
+        }
+
+    return [serialize(c) for c in chunks]
 
 
 @app.get("/chunk/{chunk_id}")
