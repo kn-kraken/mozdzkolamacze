@@ -30,7 +30,7 @@ function TreeItem({
   const [isOpen, setIsOpen] = useState(true);
   const children = item.children ?? [];
   const isLeaf = children.length === 0;
-  const isActive = isLeaf && item.id === currentChunkId;
+  const isActive = item.id === currentChunkId;
 
   if (isLeaf) {
     return (
@@ -47,13 +47,20 @@ function TreeItem({
 
   return (
     <div className="mb-2">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 w-full text-left hover:bg-gray-200 p-1 rounded"
-      >
-        <span>{isOpen ? "▼" : "▶"}</span>
-        <span className="font-medium">{item.title}</span>
-      </button>
+      <div className={`flex items-center gap-1 p-1 rounded ${isActive ? "bg-gray-200" : ""}`}>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="hover:bg-gray-300 rounded px-1"
+        >
+          {isOpen ? "▼" : "▶"}
+        </button>
+        <Link
+          href={`/learn/${item.id}`}
+          className={`font-medium hover:bg-gray-200 rounded px-1 flex-1 ${isActive ? "font-semibold" : ""}`}
+        >
+          {item.title}
+        </Link>
+      </div>
 
       {isOpen && (
         <div className="ml-4 mt-1 flex flex-col gap-1 border-l pl-2">
