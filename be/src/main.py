@@ -14,7 +14,7 @@ IMAGES_DIR.mkdir(exist_ok=True)
 app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")
 
 PDF_PATH = Path(__file__).parent / "data/dsa.pdf"
-CHUNKS_CACHE = Path(__file__).parent / "chunks.json"
+CHUNKS_CACHE = Path(__file__).parent / "data/chunks.json"
 
 sessions: dict[str, dict] = {}
 
