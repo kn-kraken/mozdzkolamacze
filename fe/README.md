@@ -1,4 +1,4 @@
-# Braincrackers frontend
+# Braincrackers backend
 
 ## Requirements
 
@@ -7,13 +7,13 @@ pnpm
 node@22.22.2
 ```
 
-### Build
+## Build
 
 ```sh
 pnpm next build
 ```
 
-### Deploy
+## Run
 
 ```sh
 pnpm next start
